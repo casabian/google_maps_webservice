@@ -13,6 +13,13 @@ class Location {
         )
       : null;
 
+  Map<String, dynamic> toJson() {
+    Map map = Map<String, dynamic>();
+    map['lat'] = lat;
+    map['lng'] = lng;
+    return map;
+  }
+
   @override
   String toString() => '$lat,$lng';
 }
@@ -42,6 +49,15 @@ class Geometry {
           Bounds.fromJson(json['bounds']),
         )
       : null;
+
+  Map<String, dynamic> toJson() {
+    Map map = Map<String, dynamic>();
+    map['location'] = (location != null) ? location.toJson() : null;
+    map['location_type'] = locationType;
+    map['viewport'] = (viewport != null) ? viewport.toJson() : null;
+    map['bounds'] = (bounds != null) ? bounds.toJson() : null;
+    return map;
+  }
 }
 
 class Bounds {
@@ -50,14 +66,18 @@ class Bounds {
 
   Bounds(this.northeast, this.southwest);
 
-  factory Bounds.fromJson(Map json) => json != null
-      ? Bounds(Location.fromJson(json['northeast']),
-          Location.fromJson(json['southwest']))
-      : null;
+  factory Bounds.fromJson(Map json) =>
+      json != null ? Bounds(Location.fromJson(json['northeast']), Location.fromJson(json['southwest'])) : null;
+
+  Map<String, dynamic> toJson() {
+    Map map = Map<String, dynamic>();
+    map['northeast'] = (northeast != null) ? northeast.toJson() : null;
+    map['southwest'] = (southwest != null) ? southwest.toJson() : null;
+    return map;
+  }
 
   @override
-  String toString() =>
-      '${northeast.lat},${northeast.lng}|${southwest.lat},${southwest.lng}';
+  String toString() => '${northeast.lat},${northeast.lng}|${southwest.lat},${southwest.lng}';
 }
 
 abstract class GoogleResponseStatus {
@@ -85,20 +105,25 @@ abstract class GoogleResponseStatus {
   bool get isNotFound => status == notFound;
 
   GoogleResponseStatus(this.status, this.errorMessage);
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> map = Map<String, dynamic>();
+    map['status'] = status;
+    map['errorMessage'] = errorMessage;
+    return map;
+  }
 }
 
 abstract class GoogleResponseList<T> extends GoogleResponseStatus {
   final List<T> results;
 
-  GoogleResponseList(String status, String errorMessage, this.results)
-      : super(status, errorMessage);
+  GoogleResponseList(String status, String errorMessage, this.results) : super(status, errorMessage);
 }
 
 abstract class GoogleResponse<T> extends GoogleResponseStatus {
   final T result;
 
-  GoogleResponse(String status, String errorMessage, this.result)
-      : super(status, errorMessage);
+  GoogleResponse(String status, String errorMessage, this.result) : super(status, errorMessage);
 }
 
 class AddressComponent {
@@ -117,9 +142,16 @@ class AddressComponent {
   );
 
   factory AddressComponent.fromJson(Map json) => json != null
-      ? AddressComponent((json['types'] as List)?.cast<String>(),
-          json['long_name'], json['short_name'])
+      ? AddressComponent((json['types'] as List)?.cast<String>(), json['long_name'], json['short_name'])
       : null;
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> map = Map<String, dynamic>();
+    map['types'] = types;
+    map['long_name'] = longName;
+    map['short_name'] = shortName;
+    return map;
+  }
 }
 
 class Component {
@@ -227,16 +259,13 @@ String transitModeToString(TransitMode type) {
 enum TransitRoutingPreferences { lessWalking, fewerTransfers }
 
 TransitRoutingPreferences stringToTransitRoutingPreferences(String type) {
-  if (type.toLowerCase() == 'less_walking')
-    return TransitRoutingPreferences.lessWalking;
-  if (type.toLowerCase() == 'fewer_transfers')
-    return TransitRoutingPreferences.fewerTransfers;
+  if (type.toLowerCase() == 'less_walking') return TransitRoutingPreferences.lessWalking;
+  if (type.toLowerCase() == 'fewer_transfers') return TransitRoutingPreferences.fewerTransfers;
   return null;
 }
 
 String transitRoutingPreferencesToString(TransitRoutingPreferences type) {
   if (type == TransitRoutingPreferences.lessWalking) return 'less_walking';
-  if (type == TransitRoutingPreferences.fewerTransfers)
-    return 'fewer_transfers';
+  if (type == TransitRoutingPreferences.fewerTransfers) return 'fewer_transfers';
   return null;
 }
